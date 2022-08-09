@@ -22,11 +22,13 @@ try:
     ghash = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode("ascii")
     ghash_arg = "-DREBXGITHASH="+ghash
 except:
-    ghash_arg = "-DREBXGITHASH=5f91e31726542abd8ad1ba11642c585246620166" #GITHASHAUTOUPDATE
+    ghash_arg = "-DREBXGITHASH=47ee9392ba633b93cebbfbf0a56b433df024811f" #GITHASHAUTOUPDATE
 
 class build_ext(_build_ext):
     def finalize_options(self):
         _build_ext.finalize_options(self)
+        if "PYODIDE" in os.environ:
+            return None
 
         try:
             import rebound
@@ -68,7 +70,7 @@ libreboundxmodule = Extension('libreboundx',
                     runtime_library_dirs = ["."],
                     libraries=['rebound'+suffix[:suffix.rfind('.')]],
                     define_macros=[ ('LIBREBOUNDX', None) ],
-                    extra_compile_args=['-fstrict-aliasing', '-O3','-std=c99', '-fPIC', '-Wpointer-arith', ghash_arg],
+                    extra_compile_args=['-fstrict-aliasing', '-D_GNU_SOURCE', '-O3','-std=c99', '-fPIC', '-Wpointer-arith', ghash_arg],
                     extra_link_args=extra_link_args,
                     )
 
@@ -77,7 +79,7 @@ with open(os.path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(name='reboundx',
-    version='3.7.0',
+    version='3.7.1',
     description='A library for including additional forces in REBOUND',
     long_description=long_description,
     url='https://github.com/dtamayo/reboundx',
