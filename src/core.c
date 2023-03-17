@@ -123,6 +123,9 @@ void rebx_register_default_params(struct rebx_extras* rebx){
     rebx_register_param(rebx, "ye_spin_axis_y", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "ye_spin_axis_z", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "gt_rho", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "pf_ap", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "pf_inc", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "pf_mplanet", REBX_TYPE_DOUBLE);
 }
 
 void rebx_register_param(struct rebx_extras* const rebx, const char* name, enum rebx_param_type type){
@@ -313,6 +316,10 @@ struct rebx_force* rebx_load_force(struct rebx_extras* const rebx, const char* n
     }
     else if (strcmp(name, "galactic_tidal_force") == 0){
         force->update_accelerations = rebx_galactic_force;
+        force->force_type = REBX_FORCE_POS;
+    }
+    else if (strcmp(name, "planet_force") == 0){
+        force->update_accelerations = rebx_planet_force;
         force->force_type = REBX_FORCE_POS;
     }
     else{
