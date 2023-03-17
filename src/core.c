@@ -128,9 +128,12 @@ void rebx_register_default_params(struct rebx_extras* rebx){
     rebx_register_param(rebx, "tau", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "ode", REBX_TYPE_ODE);
     rebx_register_param(rebx, "gt_rho", REBX_TYPE_DOUBLE);
-    rebx_register_param(rebx, "pf_ap", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "pf_inc", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "pf_ap", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "pf_as", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "pf_n", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "pf_mplanet", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "pf_mstar", REBX_TYPE_DOUBLE);
 }
 
 void rebx_register_param(struct rebx_extras* const rebx, const char* name, enum rebx_param_type type){

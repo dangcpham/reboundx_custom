@@ -48,8 +48,11 @@
  * Field (C type)               Required    Description
  * ============================ =========== ==================================================================
  * pf_inc (double)              Yes         Inclination of the planet.
- * pf_ap (double)               Yes         Semimajor axis of the planet.
+ * pf_ap (double)               Yes         Semi-major axis of the planet.
+ * pf_as (double)               Yes         Semi-major axis of the star.
+ * pf_n (double)               Yes          Mean motion of the planet.
  * pf_mplanet (double)          Yes         Planet mass.
+ * pf_mstar (double)            Yes         Star mass.
  * ============================ =========== ==================================================================
  * 
  */
@@ -64,34 +67,79 @@
 void rebx_planet_force(struct reb_simulation* const sim, struct rebx_force* const force, struct reb_particle* const particles, const int N){
     struct rebx_extras* const rebx = sim->extras;
 
-    // get particles and constants
-    const double* ap = rebx_get_param(rebx, force->ap, "pf_ap");
-    const double* inc = rebx_get_param(rebx, force->ap, "pf_inc");
-    const double* m_planet = rebx_get_param(rebx, force->ap, "pf_mplanet");
-    const double mu = sim->G * (particles[0].m + *m_planet);
+    // get physical constants and particles
     const double t = sim->t;
+    const double G = sim->G;
 
-    // mean motion * t
-    double npt = sqrt( mu / pow(*ap, 3) ) * t;
+    // get particle setups
+    const double* inc_p = rebx_get_param(rebx, force->ap, "pf_inc");
+    const double* ap = rebx_get_param(rebx, force->ap, "pf_ap");
+    const double* as = rebx_get_param(rebx, force->ap, "pf_as");
+    const double* n = rebx_get_param(rebx, force->ap, "pf_n");
+    const double* m_planet = rebx_get_param(rebx, force->ap, "pf_mplanet");
+    const double* m_star = rebx_get_param(rebx, force->ap, "pf_mstar");
 
-    // get planet position
-    double planet_x = (*ap) * cos(npt);
-    double planet_y = (*ap) * sin(npt) * cos(*inc);
-    double planet_z = (*ap) * sin(npt) * sin(*inc);
+    // other constants
+    double inc_s = -1. * (*inc_p);
+    double nt = (*n) * t;
+    double Gm_p = G * (*m_planet);
+    double Gm_s = G * (*m_star);
+
+    // particle position
+    double x = particles[0].x;
+    double y = particles[0].y;
+    double z = particles[0].z;
 
     for (int i=0; i<N; i++){
-        if (i > 0){
-            // get particle position relative to planet
-            double dx = (particles[i].x - planet_x);
-            double dy = (particles[i].y - planet_y);
-            double dz = (particles[i].z - planet_z);
-            double dist = sqrt( pow(dx, 2) + pow(dy, 2) + pow(dz, 2) );
-            double d3 = pow(dist, 3);
+        // force from planet
+        double ax_p, ay_p, az_p;
+        force_from_planet(nt, *inc_p, *ap, Gm_p, x, y, z, &ax_p, &ay_p, &az_p);
 
-            // update force
-            particles[i].ax += *m_planet/d3 * dx;
-            particles[i].ay += *m_planet/d3 * dy;
-            particles[i].az += *m_planet/d3 * dz;
-        }
+        // force from star
+        double ax_s, ay_s, az_s;
+        force_from_star(  nt,  inc_s, *as, Gm_s, x, y, z, &ax_s, &ay_s, &az_s);
+
+        // update force
+        particles[i].ax += ax_p + ax_s;
+        particles[i].ay += ay_p + ay_s;
+        particles[i].az += az_p + az_s;
     }
+}
+
+void force_from_planet(const double npt, const double inc, const double a, const double Gm, const double px, const double py, const double pz, double* ax, double* ay, double* az){
+    // get massive particle position
+    double planet_x = a * cos(npt);
+    double planet_y = a * sin(npt) * cos(inc);
+    double planet_z = a * sin(npt) * sin(inc);
+
+    // get massless position relative to massive
+    double dx = (px - planet_x);
+    double dy = (py - planet_y);
+    double dz = (pz - planet_z);
+    double dist = sqrt( pow(dx,2) + pow(dy,2) + pow(dz,2) );
+    double d3 = pow(dist,3);
+
+    // update force from massive
+    *ax = -Gm/d3 * dx;
+    *ay = -Gm/d3 * dy;
+    *az = -Gm/d3 * dz;
+}
+
+void force_from_star(const double npt, const double inc, const double a, const double Gm, const double px, const double py, const double pz, double* ax, double* ay, double* az){
+    // get massive particle position
+    double planet_x = -1. * a * cos(npt);
+    double planet_y = -1. * a * sin(npt) * cos(inc);
+    double planet_z = a * sin(npt) * sin(inc);
+
+    // get massless position relative to massive
+    double dx = (px - planet_x);
+    double dy = (py - planet_y);
+    double dz = (pz - planet_z);
+    double dist = sqrt( pow(dx,2) + pow(dy,2) + pow(dz,2) );
+    double d3 = pow(dist,3);
+
+    // update force from massive
+    *ax = -Gm/d3 * dx;
+    *ay = -Gm/d3 * dy;
+    *az = -Gm/d3 * dz;
 }
