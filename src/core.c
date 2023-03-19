@@ -132,6 +132,7 @@ void rebx_register_default_params(struct rebx_extras* rebx){
     rebx_register_param(rebx, "pf_ap", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "pf_as", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "pf_n", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "pf_m0p", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "pf_mplanet", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "pf_mstar", REBX_TYPE_DOUBLE);
 }

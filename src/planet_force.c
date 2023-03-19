@@ -51,6 +51,7 @@
  * pf_ap (double)               Yes         Semi-major axis of the planet.
  * pf_as (double)               Yes         Semi-major axis of the star.
  * pf_n (double)               Yes          Mean motion of the planet.
+ * pf_m0p (double)             Yes          Initial planet mean anomaly.
  * pf_mplanet (double)          Yes         Planet mass.
  * pf_mstar (double)            Yes         Star mass.
  * ============================ =========== ==================================================================
@@ -76,12 +77,15 @@ void rebx_planet_force(struct reb_simulation* const sim, struct rebx_force* cons
     const double* ap = rebx_get_param(rebx, force->ap, "pf_ap");
     const double* as = rebx_get_param(rebx, force->ap, "pf_as");
     const double* n = rebx_get_param(rebx, force->ap, "pf_n");
+    const double * m0p = rebx_get_param(rebx, force->ap, "pf_m0p");
     const double* m_planet = rebx_get_param(rebx, force->ap, "pf_mplanet");
     const double* m_star = rebx_get_param(rebx, force->ap, "pf_mstar");
+    
 
     // other constants
     double inc_s = -1. * (*inc_p);
-    double nt = (*n) * t;
+    double nst = (*n) * t;
+    double npt = (*n) * t + (*m0p);
     double Gm_p = G * (*m_planet);
     double Gm_s = G * (*m_star);
 
@@ -93,11 +97,11 @@ void rebx_planet_force(struct reb_simulation* const sim, struct rebx_force* cons
     for (int i=0; i<N; i++){
         // force from planet
         double ax_p, ay_p, az_p;
-        force_from_planet(nt, *inc_p, *ap, Gm_p, x, y, z, &ax_p, &ay_p, &az_p);
+        force_from_planet(npt, *inc_p, *ap, Gm_p, x, y, z, &ax_p, &ay_p, &az_p);
 
         // force from star
         double ax_s, ay_s, az_s;
-        force_from_star(  nt,  inc_s, *as, Gm_s, x, y, z, &ax_s, &ay_s, &az_s);
+        force_from_star(  nst,  inc_s, *as, Gm_s, x, y, z, &ax_s, &ay_s, &az_s);
 
         // update force
         particles[i].ax += ax_p + ax_s;
