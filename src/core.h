@@ -79,6 +79,7 @@ void rebx_tides_spin(struct reb_simulation* const sim, struct rebx_force* const 
 void rebx_yarkovsky_effect(struct reb_simulation* const sim, struct rebx_force* const force, struct reb_particle* const particles, const int N);
 void rebx_galactic_force(struct reb_simulation* const sim, struct rebx_force* const force, struct reb_particle* const particles, const int N);
 void rebx_planet_force(struct reb_simulation* const sim, struct rebx_force* const force, struct reb_particle* const particles, const int N);
+void rebx_spgt(struct reb_simulation* const sim, struct rebx_force* const force, struct reb_particle* const particles, const int N);
 
 /****************************************
  Operator prototypes

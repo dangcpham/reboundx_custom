@@ -135,6 +135,14 @@ void rebx_register_default_params(struct rebx_extras* rebx){
     rebx_register_param(rebx, "pf_m0p", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "pf_mplanet", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "pf_mstar", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "spgt_inc", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "spgt_ap", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "spgt_as", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "spgt_n", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "spgt_m0p", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "spgt_mplanet", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "spgt_mstar", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "spgt_rho", REBX_TYPE_DOUBLE);
 }
 
 void rebx_register_param(struct rebx_extras* const rebx, const char* name, enum rebx_param_type type){
@@ -333,6 +341,10 @@ struct rebx_force* rebx_load_force(struct rebx_extras* const rebx, const char* n
     }
     else if (strcmp(name, "planet_force") == 0){
         force->update_accelerations = rebx_planet_force;
+        force->force_type = REBX_FORCE_POS;
+    }
+    else if (strcmp(name, "spgt_force") == 0){
+        force->update_accelerations = rebx_spgt;
         force->force_type = REBX_FORCE_POS;
     }
     else{
