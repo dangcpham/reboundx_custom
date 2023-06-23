@@ -109,7 +109,7 @@ void rebx_planet_force(struct reb_simulation* const sim, struct rebx_force* cons
     double dp = sqrt( pow(dxp,2) + pow(dyp,2) + pow(dzp,2) );
     double d3p = pow(dp,3);
 
-    // get star distance to planet
+    // get comet distance to star
     double dxs = (x - star_x);
     double dys = (y - star_y);
     double dzs = (z - star_z);
