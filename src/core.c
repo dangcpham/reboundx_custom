@@ -39,7 +39,7 @@
 #define str(s) #s
 
 const char* rebx_build_str = __DATE__ " " __TIME__; // Date and time build string.
-const char* rebx_version_str = "3.9.3";         // **VERSIONLINE** This line gets updated automatically. Do not edit manually.
+const char* rebx_version_str = "3.10.1";         // **VERSIONLINE** This line gets updated automatically. Do not edit manually.
 const char* rebx_githash_str = STRINGIFY(REBXGITHASH);             // This line gets updated automatically. Do not edit manually.
 
 
@@ -143,6 +143,20 @@ void rebx_register_default_params(struct rebx_extras* rebx){
     rebx_register_param(rebx, "spgt_mplanet", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "spgt_mstar", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "spgt_rho", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "gas_df_rhog", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "gas_df_alpha_rhog", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "gas_df_cs", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "gas_df_alpha_cs", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "gas_df_xmin", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "gas_df_hr", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "gas_df_Qd", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "lt_R_eq", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "lt_Mom_I_fac", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "lt_rot_rate", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "lt_p_hatx", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "lt_p_haty", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "lt_p_hatz", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "lt_c", REBX_TYPE_DOUBLE);
 }
 
 void rebx_register_param(struct rebx_extras* const rebx, const char* name, enum rebx_param_type type){
@@ -346,6 +360,14 @@ struct rebx_force* rebx_load_force(struct rebx_extras* const rebx, const char* n
     else if (strcmp(name, "spgt_force") == 0){
         force->update_accelerations = rebx_spgt;
         force->force_type = REBX_FORCE_POS;
+    }
+    else if (strcmp(name, "gas_dynamical_friction") == 0){
+        force->update_accelerations = rebx_gas_dynamical_friction;
+        force->force_type = REBX_FORCE_VEL;
+    }
+    else if (strcmp(name, "lense_thirring") == 0){
+        force->update_accelerations = rebx_lense_thirring;
+        force->force_type = REBX_FORCE_VEL;
     }
     else{
         char str[300];
