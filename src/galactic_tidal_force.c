@@ -60,8 +60,9 @@
 #include "reboundx.h"
 
 void rebx_galactic_force(struct reb_simulation* const sim, struct rebx_force* const force, struct reb_particle* const particles, const int N){
+  struct rebx_extras* const rebx = sim->extras;
   for (int i=0; i<N; i++){
-        const double* const rho = rebx_get_param(sim->extras, particles[i].ap, "gt_rho");
+        const double* const rho = rebx_get_param(rebx, particles[i].ap, "gt_rho");
         if (rho != NULL){
             particles[i].az -= 4.0 * M_PI * (*rho) * (sim->G) * particles[i].z;
         }
