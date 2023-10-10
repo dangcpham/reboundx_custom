@@ -244,6 +244,19 @@ struct rebx_interpolator{
     double* y2;
     int klo;
 };
+
+struct rebx_flybys{
+    double* t0;
+    double* tf;
+    double* a;
+    double* ecc;
+    double* E0;
+    double* Omega;
+    double* inc;
+    double* omega;
+    int Nvalues;
+};
+
 /**
  * @brief Main REBOUNDx structure.
  * @details These fields are used internally by REBOUNDx and generally should not be changed manually by the user. Use the API instead.
@@ -701,6 +714,31 @@ void rebx_free_interpolator(struct rebx_interpolator* const interpolator);
 double rebx_interpolate(struct rebx_extras* const rebx, struct rebx_interpolator* const interpolator, const double time);
 /** @} */
 /** @} */
+
+/****************************************
+ Flyby Import Routines
+ *****************************************/
+/**
+ * \name Flyby Routines
+ * @{
+ */
+/**
+ * @defgroup FlybyFunctions
+ * @details Functions for importing flybys.
+ * @{
+ */
+
+/**
+ * @brief Takes in initial condition for flybys and last flyby time.
+ * @details See the parameter interpolation examples in C and Python.
+ * @param rebx pointer to the REBOUNDx extras instance.
+ * @param Nvalues Length of times and values arrays (must be equal for both).
+ */
+struct rebx_flybys* rebx_create_flybys(struct rebx_extras* const rebx, const int Nvalues, const double* t0, const double* tf, const double* a, const double* ecc, const double* E0, const double* Omega, const double* inc, const double* omega);
+/**
+ * @brief Frees the memory for a rebx_flybys structure.
+ */
+void rebx_free_flybys(struct rebx_flybys* const flybys);
 
 /****************************************
  Testing Functions

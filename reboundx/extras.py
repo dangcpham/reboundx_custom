@@ -365,6 +365,37 @@ Interpolator._fields_ = [  ("interpolation", c_int),
 
 INTERPOLATION_TYPE = {"none":0, "spline":1}
 
+class Flybys(Structure):
+    def __new__(cls, rebx, t0, tf, a, ecc, E0, Omega, inc, omega):
+        flybys = super(Flybys, cls).__new__(cls)
+        return flybys
+
+    def __init__(self, rebx, t0, tf, a, ecc, E0, Omega, inc, omega):
+        # TODO: error checking
+
+        Nvalues = len(t0)
+
+        DblArr = c_double * Nvalues
+        clibreboundx.rebx_init_flybys(byref(rebx), byref(self), c_int(Nvalues), 
+                                            DblArr(*t0), DblArr(*tf), 
+                                            DblArr(*a), DblArr(*ecc), DblArr(*E0),
+                                            DblArr(*Omega), DblArr(*inc), DblArr(*omega)
+                                            )
+    def __del__(self):
+        if self._b_needsfree_ == 1:
+            clibreboundx.rebx_free_flybys_pointers(byref(self))
+
+Flybys._fields_ = [ ("t0", POINTER(c_double)),
+                    ("tf", POINTER(c_double)),
+                    ("a", POINTER(c_double)),
+                    ("ecc", POINTER(c_double)),
+                    ("E0", POINTER(c_double)),
+                    ("Omega", POINTER(c_double)),
+                    ("inc", POINTER(c_double)),
+                    ("omega", POINTER(c_double)),
+                    ("Nvalues", c_int)]
+
+
 # This list keeps pairing from C rebx_param_type enum to ctypes type 1-to-1. Derive the required mappings from it
 REBX_C_TO_CTYPES = [["REBX_TYPE_NONE", None], ["REBX_TYPE_DOUBLE", c_double], ["REBX_TYPE_INT",c_int], ["REBX_TYPE_POINTER", c_void_p], ["REBX_TYPE_FORCE", Force], ["REBX_TYPE_UNIT32", c_uint32], ["REBX_TYPE_ORBIT", rebound.Orbit], ["REBX_TYPE_ODE", rebound.ODE], ["REBX_TYPE_VEC3D", rebound._Vec3d]]
 REBX_CTYPES = {} # maps int value of rebx_param_type enum to ctypes type
