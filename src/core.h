@@ -45,7 +45,7 @@ struct rebx_node;
 void rebx_initialize(struct reb_simulation* sim, struct rebx_extras* rebx); // Initializes all pointers and values.
 void rebx_register_default_params(struct rebx_extras* rebx); // Registers default params
 void rebx_init_interpolator(struct rebx_extras* const rebx, struct rebx_interpolator* const interp, const int Nvalues, const double* times, const double* values, enum rebx_interpolation_type interpolation);
-void rebx_init_flybys(struct rebx_extras* const rebx, struct rebx_flybys* const flybys, const int Nvalues, const double* t0, const double* tf, const double* a, const double* ecc, const double* E0, const double* Omega, const double* inc, const double* omega);
+void rebx_init_flybys(struct rebx_extras* const rebx, struct rebx_flybys* const flybys, const int Nvalues, const double* m, const double* t0, const double* tf, const double* n, const double* a, const double* ecc, const double* M0, const double* Omega, const double* inc, const double* omega);
 
 /**********************************************
  Functions executing forces & ptm each timestep
@@ -80,6 +80,7 @@ void rebx_tides_spin(struct reb_simulation* const sim, struct rebx_force* const 
 void rebx_yarkovsky_effect(struct reb_simulation* const sim, struct rebx_force* const force, struct reb_particle* const particles, const int N);
 void rebx_galactic_force(struct reb_simulation* const sim, struct rebx_force* const force, struct reb_particle* const particles, const int N);
 void rebx_planet_force(struct reb_simulation* const sim, struct rebx_force* const force, struct reb_particle* const particles, const int N);
+void rebx_flybys_force(struct reb_simulation* const sim, struct rebx_force* const force, struct reb_particle* const particles, const int N);
 void rebx_spgt(struct reb_simulation* const sim, struct rebx_force* const force, struct reb_particle* const particles, const int N);
 void rebx_gas_dynamical_friction(struct reb_simulation* const sim, struct rebx_force* const force, struct reb_particle* const particles, const int N);
 void rebx_lense_thirring(struct reb_simulation* const sim, struct rebx_force* const force, struct reb_particle* const particles, const int N);

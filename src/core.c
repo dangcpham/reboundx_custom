@@ -143,6 +143,8 @@ void rebx_register_default_params(struct rebx_extras* rebx){
     rebx_register_param(rebx, "spgt_mplanet", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "spgt_mstar", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "spgt_rho", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "flybys_data", REBX_TYPE_FLYBYS);
+    rebx_register_param(rebx, "flybys_mode", REBX_TYPE_INT);
     rebx_register_param(rebx, "gas_df_rhog", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "gas_df_alpha_rhog", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "gas_df_cs", REBX_TYPE_DOUBLE);
@@ -355,6 +357,10 @@ struct rebx_force* rebx_load_force(struct rebx_extras* const rebx, const char* n
     }
     else if (strcmp(name, "planet_force") == 0){
         force->update_accelerations = rebx_planet_force;
+        force->force_type = REBX_FORCE_POS;
+    }
+    else if (strcmp(name, "flybys_force") == 0){
+        force->update_accelerations = rebx_flybys_force;
         force->force_type = REBX_FORCE_POS;
     }
     else if (strcmp(name, "spgt_force") == 0){

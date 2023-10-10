@@ -57,7 +57,8 @@ enum rebx_param_type{
     REBX_TYPE_UINT32,
     REBX_TYPE_ORBIT,
     REBX_TYPE_ODE,
-    REBX_TYPE_VEC3D
+    REBX_TYPE_VEC3D,
+    REBX_TYPE_FLYBYS
 };
 
 /**
@@ -246,11 +247,13 @@ struct rebx_interpolator{
 };
 
 struct rebx_flybys{
+    double* m;
     double* t0;
     double* tf;
+    double* n;
     double* a;
     double* ecc;
-    double* E0;
+    double* M0;
     double* Omega;
     double* inc;
     double* omega;
@@ -734,7 +737,7 @@ double rebx_interpolate(struct rebx_extras* const rebx, struct rebx_interpolator
  * @param rebx pointer to the REBOUNDx extras instance.
  * @param Nvalues Length of times and values arrays (must be equal for both).
  */
-struct rebx_flybys* rebx_create_flybys(struct rebx_extras* const rebx, const int Nvalues, const double* t0, const double* tf, const double* a, const double* ecc, const double* E0, const double* Omega, const double* inc, const double* omega);
+struct rebx_flybys* rebx_create_flybys(struct rebx_extras* const rebx, const int Nvalues, const double* m, const double* t0, const double* tf, const double* n, const double* a, const double* ecc, const double* M0, const double* Omega, const double* inc, const double* omega);
 /**
  * @brief Frees the memory for a rebx_flybys structure.
  */

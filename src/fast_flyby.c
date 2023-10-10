@@ -66,30 +66,93 @@
 #include "reboundx.h"
 #include "core.h"
 
-// void rebx_xyz_unbound(struct rebx_extras* const rebx, const double* t0, const double* tf, const double* a, const double* ecc, const double* E0, const double* Omega, const double* inc, const double* omega);
+void rebx_xyz_unbound(double* x, double* y, double* z, double a, double ecc, double ecc_anomaly, double Omega, double inc, double omega){
+    // calculates position of flyby star relative to the COM of the current sim
+    // e.g. if there's only star in the sim, then xyz is the heliocentric coordinates of the flyby star
 
-struct rebx_flybys* rebx_create_flybys(struct rebx_extras* const rebx, const int Nvalues, const double* t0, const double* tf, const double* a, const double* ecc, const double* E0, const double* Omega, const double* inc, const double* omega){
+    double cosh_term = (ecc-cosh(ecc_anomaly));
+    double sqrte_term = sqrt(ecc*ecc - 1);
+
+    *x = -a*(sinh(ecc_anomaly)*sqrte_term*(sin(omega)*cos(Omega) + sin(Omega)*cos(inc)*cos(omega)) -
+             cosh_term*(sin(Omega)*sin(omega)*cos(inc) - cos(Omega)*cos(omega)));
+
+    *y = -a*(sinh(ecc_anomaly)*sqrte_term*(sin(Omega)*sin(omega) - cos(inc)*cos(Omega)*cos(omega)) +
+             cosh_term*(sin(omega)*cos(inc)*cos(Omega) + sin(Omega)*cos(omega)));
+
+    *z = -a*sin(inc)*(cosh_term*sin(omega)-sinh(ecc_anomaly)*cos(omega)*sqrte_term);
+
+}
+
+void rebx_flybys_force(struct reb_simulation* const sim, struct rebx_force* const force, struct reb_particle* const particles, const int N){
+    struct rebx_extras* const rebx = sim->extras;
+    struct rebx_flybys* const flybys = rebx_get_param(rebx, force->ap, "flybys_data");
+    const double Nflybys = flybys->Nvalues;
+    const double t = sim->t;
+    const double G = sim->G;
+
+    for (int i=0; i<Nflybys; i++){
+        if ((t >= flybys->t0[i]) && (t <= flybys->tf[i])){
+            // calculate new eccentric anomaly at time t
+            const double M = (2.*M_PI - flybys->M0[i] + (flybys->n[i] * t));
+            const double ecc_anomaly = reb_tools_M_to_E(flybys->ecc[i], M);
+
+            // calculate position of flyby at time t
+            double x, y, z;
+            rebx_xyz_unbound(&x, &y, &z, flybys->a[i], flybys->ecc[i], ecc_anomaly, flybys->Omega[i], flybys->inc[i], flybys->omega[i]);
+
+            double GM = G * flybys->m[i];
+            
+            // calculate force from x, y, z to each particle
+            for (int j=0; j<N; j++){
+                // ignore particles that don't feel the flyby force
+                // e.g. this would be the central star if there is a star + massless test particle
+                // because flyby implemented is in heliocentric coordinate system
+                const int* flybys_mode = rebx_get_param(rebx, particles[j].ap, "flybys_mode");
+                printf("%f %i %i %f %f %f %f\n ", flybys->ecc[i], j, *flybys_mode, t, x, y, z);
+                if (*flybys_mode == 1.0){
+                    // get particle distance to flyby star
+                    double dx = (particles[j].x - x);
+                    double dy = (particles[j].y - y);
+                    double dz = (particles[j].z - z);
+                    double d = sqrt( dx*dx + dy*dy + dz*dz );
+                    double d3 = d*d*d;
+
+                    // update particle acceleration
+                    particles[j].ax -= (GM/d3) * dx ;
+                    particles[j].ay -= (GM/d3) * dy ;
+                    particles[j].az -= (GM/d3) * dz ;
+                }
+            }
+        }
+    }
+}
+
+struct rebx_flybys* rebx_create_flybys(struct rebx_extras* const rebx, const int Nvalues, const double* m, const double* t0, const double* tf, const double* n, const double* a, const double* ecc, const double* M0, const double* Omega, const double* inc, const double* omega){
     struct rebx_flybys* flybys = rebx_malloc(rebx, sizeof(*flybys));
-    rebx_init_flybys(rebx, flybys, Nvalues, t0, tf, a, ecc, E0, Omega, inc, omega);
+    rebx_init_flybys(rebx, flybys, Nvalues, m, t0, tf, n, a, ecc, M0, Omega, inc, omega);
     return flybys;
 }
 
-void rebx_init_flybys(struct rebx_extras* const rebx, struct rebx_flybys* const flybys, const int Nvalues, const double* t0, const double* tf, const double* a, const double* ecc, const double* E0, const double* Omega, const double* inc, const double* omega){
+void rebx_init_flybys(struct rebx_extras* const rebx, struct rebx_flybys* const flybys, const int Nvalues, const double* m, const double* t0, const double* tf, const double* n, const double* a, const double* ecc, const double* M0, const double* Omega, const double* inc, const double* omega){
     flybys->Nvalues = Nvalues;
+    flybys->m = calloc(Nvalues, sizeof(*flybys->m));
     flybys->t0 = calloc(Nvalues, sizeof(*flybys->t0));
     flybys->tf = calloc(Nvalues, sizeof(*flybys->tf));
-    flybys->a  = calloc(Nvalues, sizeof(*flybys->a));
+    flybys->n = calloc(Nvalues, sizeof(*flybys->n));
+    flybys->a = calloc(Nvalues, sizeof(*flybys->a));
     flybys->ecc = calloc(Nvalues, sizeof(*flybys->ecc));
-    flybys->E0 = calloc(Nvalues, sizeof(*flybys->E0));
+    flybys->M0 = calloc(Nvalues, sizeof(*flybys->M0));
     flybys->Omega = calloc(Nvalues, sizeof(*flybys->Omega));
     flybys->inc = calloc(Nvalues, sizeof(*flybys->inc));
     flybys->omega = calloc(Nvalues, sizeof(*flybys->omega));
 
+    memcpy(flybys->m, m, Nvalues*sizeof(*flybys->m));
     memcpy(flybys->t0, t0, Nvalues*sizeof(*flybys->t0));
     memcpy(flybys->tf, tf, Nvalues*sizeof(*flybys->tf));
+    memcpy(flybys->n, n, Nvalues*sizeof(*flybys->n));
     memcpy(flybys->a, a, Nvalues*sizeof(*flybys->a));
     memcpy(flybys->ecc, ecc,  Nvalues*sizeof(*flybys->ecc));
-    memcpy(flybys->E0, E0,  Nvalues*sizeof(*flybys->E0));
+    memcpy(flybys->M0, M0,  Nvalues*sizeof(*flybys->M0));
     memcpy(flybys->Omega, Omega, Nvalues*sizeof(*flybys->Omega));
     memcpy(flybys->inc, inc, Nvalues*sizeof(*flybys->inc));
     memcpy(flybys->omega, omega, Nvalues*sizeof(*flybys->omega));
@@ -98,11 +161,13 @@ void rebx_init_flybys(struct rebx_extras* const rebx, struct rebx_flybys* const 
 }
 
 void rebx_free_flybys_pointers(struct rebx_flybys* const flybys){
+    free(flybys->m); 
     free(flybys->t0); 
     free(flybys->tf);
+    free(flybys->n);
     free(flybys->a);
     free(flybys->ecc);
-    free(flybys->E0);
+    free(flybys->M0);
     free(flybys->Omega);
     free(flybys->inc);
     free(flybys->omega);
