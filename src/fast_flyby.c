@@ -100,15 +100,15 @@ void rebx_flybys_force(struct reb_simulation* const sim, struct rebx_force* cons
             double x, y, z;
             rebx_xyz_unbound(&x, &y, &z, flybys->a[i], flybys->ecc[i], ecc_anomaly, flybys->Omega[i], flybys->inc[i], flybys->omega[i]);
 
-            double GM = G * flybys->m[i];
-            
             // calculate force from x, y, z to each particle
+            double GM = G * flybys->m[i];
             for (int j=0; j<N; j++){
                 // ignore particles that don't feel the flyby force
                 // e.g. this would be the central star if there is a star + massless test particle
                 // because flyby implemented is in heliocentric coordinate system
                 const int* flybys_mode = rebx_get_param(rebx, particles[j].ap, "flybys_mode");
-                printf("%f %i %i %f %f %f %f\n ", flybys->ecc[i], j, *flybys_mode, t, x, y, z);
+
+                // printf("%f %i %i %f %f %f %f\n ", flybys->ecc[i], j, *flybys_mode, t, x, y, z);
                 if (*flybys_mode == 1.0){
                     // get particle distance to flyby star
                     double dx = (particles[j].x - x);
