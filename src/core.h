@@ -45,6 +45,7 @@ struct rebx_node;
 void rebx_initialize(struct reb_simulation* sim, struct rebx_extras* rebx); // Initializes all pointers and values.
 void rebx_register_default_params(struct rebx_extras* rebx); // Registers default params
 void rebx_init_interpolator(struct rebx_extras* const rebx, struct rebx_interpolator* const interp, const int Nvalues, const double* times, const double* values, enum rebx_interpolation_type interpolation);
+void rebx_init_planets(struct rebx_extras* const rebx, struct rebx_planets* const planets, const int Nplanets, const int Nparams, const double* planets_data, const double* masses);
 
 /**********************************************
  Functions executing forces & ptm each timestep
@@ -79,6 +80,8 @@ void rebx_tides_spin(struct reb_simulation* const sim, struct rebx_force* const 
 void rebx_yarkovsky_effect(struct reb_simulation* const sim, struct rebx_force* const force, struct reb_particle* const particles, const int N);
 void rebx_gas_dynamical_friction(struct reb_simulation* const sim, struct rebx_force* const force, struct reb_particle* const particles, const int N);
 void rebx_lense_thirring(struct reb_simulation* const sim, struct rebx_force* const force, struct reb_particle* const particles, const int N);
+void rebx_planets_force(struct reb_simulation* const sim, struct rebx_force* const force, struct reb_particle* const particles, const int N);
+
 /****************************************
  Operator prototypes
  *****************************************/
@@ -105,6 +108,7 @@ void rebx_free_step(struct rebx_step* step);
 void rebx_free_pointers(struct rebx_extras* rebx);
 void rebx_free_param(struct rebx_param* param);
 void rebx_free_interpolator_pointers(struct rebx_interpolator* const interpolator);
+void rebx_free_planets_pointers(struct rebx_planets* const planets);
 
 enum rebx_param_type rebx_get_type(struct rebx_extras* rebx, const char* name);
 
