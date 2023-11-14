@@ -45,7 +45,7 @@ class build_ext(_build_ext):
         rebdirsp = sysconfig.get_path('platlib')+'/'
         print("***", rebdir, "***", rebdirsp, "***")
         self.include_dirs.append(rebdir)
-        sources = [ 'src/interpolation.c', 'src/gr_potential.c', 'src/yarkovsky_effect.c', 'src/tides_constant_time_lag.c', 'src/integrator_rk2.c', 'src/modify_mass.c', 'src/lense_thirring.c', 'src/modify_orbits_forces.c', 'src/radiation_forces.c', 'src/stochastic_forces.c', 'src/tides_spin.c', 'src/steppers.c', 'src/track_min_distance.c', 'src/inner_disk_edge.c', 'src/central_force.c', 'src/output.c', 'src/gravitational_harmonics.c', 'src/input.c', 'src/exponential_migration.c', 'src/core.c', 'src/integrator_euler.c', 'src/linkedlist.c', 'src/integrator_implicit_midpoint.c', 'src/gr.c', 'src/type_I_migration.c', 'src/gr_full.c', 'src/integrate_force.c', 'src/fast_planet.c', 'src/gas_dynamical_friction.c', 'src/modify_orbits_direct.c', 'src/rebxtools.c', 'src/integrator_rk4.c'],
+        sources = [ 'src/central_force.c', 'src/core.c', 'src/exponential_migration.c', 'src/fast_planet.c', 'src/galactic_tidal_force.c', 'src/gas_dynamical_friction.c', 'src/gr.c', 'src/gravitational_harmonics.c', 'src/gr_full.c', 'src/gr_potential.c', 'src/inner_disk_edge.c', 'src/input.c', 'src/integrate_force.c', 'src/integrator_euler.c', 'src/integrator_implicit_midpoint.c', 'src/integrator_rk2.c', 'src/integrator_rk4.c', 'src/interpolation.c', 'src/lense_thirring.c', 'src/linkedlist.c', 'src/modify_mass.c', 'src/modify_orbits_direct.c', 'src/modify_orbits_forces.c', 'src/output.c', 'src/radiation_forces.c', 'src/rebxtools.c', 'src/steppers.c', 'src/stochastic_forces.c', 'src/tides_constant_time_lag.c', 'src/tides_spin.c', 'src/track_min_distance.c', 'src/type_I_migration.c', 'src/yarkovsky_effect.c'],
         
         self.library_dirs.append(rebdir+'/../')
         self.library_dirs.append(rebdirsp)
@@ -72,7 +72,7 @@ if FFP_CONTRACT_OFF:
     extra_compile_args.append('-ffp-contract=off')
 
 libreboundxmodule = Extension('libreboundx',
-        sources = [ 'src/interpolation.c', 'src/gr_potential.c', 'src/yarkovsky_effect.c', 'src/tides_constant_time_lag.c', 'src/integrator_rk2.c', 'src/modify_mass.c', 'src/lense_thirring.c', 'src/modify_orbits_forces.c', 'src/radiation_forces.c', 'src/stochastic_forces.c', 'src/tides_spin.c', 'src/steppers.c', 'src/track_min_distance.c', 'src/inner_disk_edge.c', 'src/central_force.c', 'src/output.c', 'src/gravitational_harmonics.c', 'src/input.c', 'src/exponential_migration.c', 'src/core.c', 'src/integrator_euler.c', 'src/linkedlist.c', 'src/integrator_implicit_midpoint.c', 'src/gr.c', 'src/type_I_migration.c', 'src/gr_full.c', 'src/integrate_force.c', 'src/fast_planet.c', 'src/gas_dynamical_friction.c', 'src/modify_orbits_direct.c', 'src/rebxtools.c', 'src/integrator_rk4.c'],
+        sources = [ 'src/central_force.c', 'src/core.c', 'src/exponential_migration.c', 'src/fast_planet.c', 'src/galactic_tidal_force.c', 'src/gas_dynamical_friction.c', 'src/gr.c', 'src/gravitational_harmonics.c', 'src/gr_full.c', 'src/gr_potential.c', 'src/inner_disk_edge.c', 'src/input.c', 'src/integrate_force.c', 'src/integrator_euler.c', 'src/integrator_implicit_midpoint.c', 'src/integrator_rk2.c', 'src/integrator_rk4.c', 'src/interpolation.c', 'src/lense_thirring.c', 'src/linkedlist.c', 'src/modify_mass.c', 'src/modify_orbits_direct.c', 'src/modify_orbits_forces.c', 'src/output.c', 'src/radiation_forces.c', 'src/rebxtools.c', 'src/steppers.c', 'src/stochastic_forces.c', 'src/tides_constant_time_lag.c', 'src/tides_spin.c', 'src/track_min_distance.c', 'src/type_I_migration.c', 'src/yarkovsky_effect.c'],
                     include_dirs = ['src'],
                     library_dirs = [],
                     runtime_library_dirs = ["."],
@@ -118,9 +118,9 @@ setup(name='reboundx',
     keywords='astronomy astrophysics nbody integrator',
     packages=['reboundx'],
     cmdclass={'build_ext':build_ext},
-    setup_requires=['rebound>=3.23.0'],
-    install_requires=['rebound>=3.23.0'],
-    tests_require=['rebound>=3.23.0','numpy'],
+    setup_requires=['rebound<4.0.0'],
+    install_requires=['rebound<4.0.0'],
+    tests_require=['rebound<4.0.0','numpy'],
     test_suite="reboundx.test",
     ext_modules = [libreboundxmodule],
     zip_safe=False)
