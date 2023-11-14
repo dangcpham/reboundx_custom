@@ -95,9 +95,11 @@ void rebx_planets_force(struct reb_simulation* const sim, struct rebx_force* con
         double Omega = planets_data[rc_idx(i, 4, Nparams)];
         double M0    = planets_data[rc_idx(i, 5, Nparams)];
         double n     = planets_data[rc_idx(i, 6, Nparams)];
+        double t0    = planets_data[rc_idx(i, 7, Nparams)];
 
-        // calculate the mean motion at time t
-        double M = M0 + n * t;
+        // calculate the mean motion at time t 
+        // (since some reference t0 time, corresponding to M0)
+        double M = M0 + n * (t-t0);
         // convert to true anomaly
         double f = reb_tools_M_to_f(e, M);
 

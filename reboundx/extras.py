@@ -372,7 +372,7 @@ class Planets(Structure):
 
     def __init__(self, rebx, Nplanets, planets_data, masses):
         # TODO: error checking
-        Nparams = 7
+        Nparams = 8
 
         clibreboundx.rebx_init_planets(byref(rebx), byref(self), c_int(Nplanets), c_int(Nparams),
                                     planets_data,masses)
