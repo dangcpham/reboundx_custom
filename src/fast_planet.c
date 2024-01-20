@@ -139,7 +139,7 @@ void rebx_planets_force(struct reb_simulation* const sim, struct rebx_force* con
             particles[j].ay += GM * dy/d3 ;
             particles[j].az += GM * dz/d3 ;
 
-            if (j==0 && d1 <= 0.004650467260962157){
+            if (i==0 && j==0 && d1 <= 0.004650467260962157){
                 reb_stop(sim);
             }
         }
