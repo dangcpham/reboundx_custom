@@ -97,6 +97,8 @@ void rebx_planets_force(struct reb_simulation* const sim, struct rebx_force* con
         double n     = planets_data[rc_idx(i, 6, Nparams)];
         double t0    = planets_data[rc_idx(i, 7, Nparams)];
 
+        // printf("%e %e %e %e %e %e %e %e\n", a, e, inc, omega, Omega, M0, n, t0);
+
         // calculate the mean motion at time t 
         // (since some reference t0 time, corresponding to M0)
         double M = M0 + n * (t-t0);
@@ -136,10 +138,12 @@ void rebx_planets_force(struct reb_simulation* const sim, struct rebx_force* con
             particles[j].ax += GM * dx/d3 ;
             particles[j].ay += GM * dy/d3 ;
             particles[j].az += GM * dz/d3 ;
+
+            if (j==0 && d1 <= 0.004650467260962157){
+                reb_stop(sim);
+            }
         }
     }
-
-    
 }
 
 int rc_idx(const int r, const int c, const int N){
