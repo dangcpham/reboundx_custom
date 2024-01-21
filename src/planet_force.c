@@ -103,6 +103,7 @@ void rebx_planet_force(struct reb_simulation* const sim, struct rebx_force* cons
     double z = particles[0].z;
 
     struct reb_simulation* r = reb_create_simulation();
+    r->G = sim->G;
     reb_add_fmt(r, "m", *m_star);
     reb_add_fmt(r, "m a e inc M", *m_planet, *ap, 0., *inc_p, (*n) * t + (*m0p));
     reb_move_to_com(r);
@@ -123,6 +124,7 @@ void rebx_planet_force(struct reb_simulation* const sim, struct rebx_force* cons
         printf("Engulfed");
         reb_stop(sim);
     }
+    reb_free_simulation(r);
 
     // get comet distance to planet
     double dxp = (x - planet_x);
