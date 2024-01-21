@@ -116,6 +116,10 @@ void rebx_planet_force(struct reb_simulation* const sim, struct rebx_force* cons
     double ds = sqrt( pow(dxs,2) + pow(dys,2) + pow(dzs,2) );
     double d3s = pow(ds,3);
 
+    if (ds <= 0.004650467260962157){
+        reb_stop(sim);
+    }
+
     // calculate force
     double axp = (-Gm_p/d3p) * dxp;
     double ayp = (-Gm_p/d3p) * dyp;
