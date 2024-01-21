@@ -75,56 +75,32 @@ void rebx_planet_force(struct reb_simulation* const sim, struct rebx_force* cons
     // get particle setups
     const double* inc_p = rebx_get_param(rebx, force->ap, "pf_inc");
     const double* ap = rebx_get_param(rebx, force->ap, "pf_ap");
-    // const double* as = rebx_get_param(rebx, force->ap, "pf_as");
+    const double* as = rebx_get_param(rebx, force->ap, "pf_as");
     const double* n = rebx_get_param(rebx, force->ap, "pf_n");
     const double* m0p = rebx_get_param(rebx, force->ap, "pf_m0p");
     const double* m_planet = rebx_get_param(rebx, force->ap, "pf_mplanet");
     const double* m_star = rebx_get_param(rebx, force->ap, "pf_mstar");
 
     // // other constants
-    // double inc_s = -1. * (*inc_p);
-    // double nt = (*n) * t + (*m0p);
+    double inc_s = -1. * (*inc_p);
+    double nt = (*n) * t + (*m0p);
     double Gm_p = G * (*m_planet);
     double Gm_s = G * (*m_star);
 
-    // // get planet position
-    // double planet_x = (*ap) * cos(nt);
-    // double planet_y = (*ap) * sin(nt) * cos(*inc_p);
-    // double planet_z = (*ap) * sin(nt) * sin(*inc_p);
+    // get planet position
+    double planet_x = (*ap) * cos(nt);
+    double planet_y = (*ap) * sin(nt) * cos(*inc_p);
+    double planet_z = (*ap) * sin(nt) * sin(*inc_p);
 
-    // // get star position
-    // double star_x = -1. * (*as) * cos(nt);
-    // double star_y = -1. * (*as) * sin(nt) * cos(inc_s);
-    // double star_z = (*as) * sin(nt) * sin(inc_s);
+    // get star position
+    double star_x = -1. * (*ap) * cos(nt);
+    double star_y = -1. * (*ap) * sin(nt) * cos(inc_s);
+    double star_z = (*ap) * sin(nt) * sin(inc_s);
 
     // particle position
     double x = particles[0].x;
     double y = particles[0].y;
     double z = particles[0].z;
-
-    struct reb_simulation* r = reb_create_simulation();
-    r->G = sim->G;
-    reb_add_fmt(r, "m", *m_star);
-    reb_add_fmt(r, "m a e inc M", *m_planet, *ap, 0., *inc_p, (*n) * t + (*m0p));
-    reb_move_to_com(r);
-    reb_add(r, particles[0]);
-
-    // get star position
-    double star_x = r->particles[0].x;
-    double star_y = r->particles[0].y;
-    double star_z = r->particles[0].z;
-
-    // get planet position
-    double planet_x = r->particles[1].x;
-    double planet_y = r->particles[1].y;
-    double planet_z = r->particles[1].z;
-
-    struct reb_orbit o =  reb_tools_particle_to_orbit(r->G, r->particles[2], r->particles[0]);
-    if (o.a*(1-o.e) <= 0.004650467260962157 && o.d <= 6.933612743506348){
-        printf("Engulfed");
-        reb_stop(sim);
-    }
-    reb_free_simulation(r);
 
     // get comet distance to planet
     double dxp = (x - planet_x);
@@ -140,7 +116,24 @@ void rebx_planet_force(struct reb_simulation* const sim, struct rebx_force* cons
     double ds = sqrt( pow(dxs,2) + pow(dys,2) + pow(dzs,2) );
     double d3s = pow(ds,3);
 
-    
+    if (ds <= 0.004650467260962157){
+        printf("Engulfed");
+        reb_stop(sim);
+    }
+    if (reb_output_check(sim, 10.) && ds <= 5 * *ap){
+        struct reb_simulation* r = reb_create_simulation();
+        r->G = sim->G;
+        reb_add_fmt(r, "m", *m_star);
+        reb_add_fmt(r, "m a e inc M", *m_planet, *ap, 0., *inc_p, (*n) * t + (*m0p));
+        reb_move_to_com(r);
+
+        struct reb_orbit o =  reb_tools_particle_to_orbit(sim->G, particles[0], r->particles[0]);
+        reb_free_simulation(r);
+        if (o.a*(1-o.e) <= 0.004650467260962157 && o.d <= *ap){
+            printf("Engulfed");
+            reb_stop(sim);
+        }
+    }
 
     // calculate force
     double axp = (-Gm_p/d3p) * dxp;
