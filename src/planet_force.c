@@ -116,24 +116,24 @@ void rebx_planet_force(struct reb_simulation* const sim, struct rebx_force* cons
     double ds = sqrt( pow(dxs,2) + pow(dys,2) + pow(dzs,2) );
     double d3s = pow(ds,3);
 
-    if (ds <= 0.004650467260962157){
-        printf("Engulfed");
-        reb_stop(sim);
-    }
-    if (reb_output_check(sim, 10.) && ds <= 5 * *ap){
-        struct reb_simulation* r = reb_create_simulation();
-        r->G = sim->G;
-        reb_add_fmt(r, "m", *ms);
-        reb_add_fmt(r, "m a e inc M", *mp, *ap, 0., *inc_p, (*n) * t + (*m0p));
-        reb_move_to_com(r);
+    // if (ds <= 0.004650467260962157){
+    //     printf("Engulfed");
+    //     reb_stop(sim);
+    // }
+    // if (reb_output_check(sim, 10.) && ds <= 5 * *ap){
+    //     struct reb_simulation* r = reb_create_simulation();
+    //     r->G = sim->G;
+    //     reb_add_fmt(r, "m", *ms);
+    //     reb_add_fmt(r, "m a e inc M", *mp, *ap, 0., *inc_p, (*n) * t + (*m0p));
+    //     reb_move_to_com(r);
 
-        struct reb_orbit o =  reb_tools_particle_to_orbit(sim->G, particles[0], r->particles[0]);
-        reb_free_simulation(r);
-        if (o.a*(1-o.e) <= 0.004650467260962157 && o.d <= *ap){
-            printf("Engulfed");
-            reb_stop(sim);
-        }
-    }
+    //     struct reb_orbit o =  reb_tools_particle_to_orbit(sim->G, particles[0], r->particles[0]);
+    //     reb_free_simulation(r);
+    //     if (o.a*(1-o.e) <= 0.004650467260962157 && o.d <= *ap){
+    //         printf("Engulfed");
+    //         reb_stop(sim);
+    //     }
+    // }
 
     // calculate force
     double axp = (-Gm_p/d3p) * dxp;
