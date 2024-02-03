@@ -73,29 +73,29 @@ void rebx_planet_force(struct reb_simulation* const sim, struct rebx_force* cons
     const double G = sim->G;
 
     // get particle setups
-    const double* inc_p = rebx_get_param(rebx, force->ap, "pf_inc");
+    // const double* inc_p = rebx_get_param(rebx, force->ap, "pf_inc");
     const double* ap = rebx_get_param(rebx, force->ap, "pf_ap");
-    const double* as = rebx_get_param(rebx, force->ap, "pf_as");
+    // const double* as = rebx_get_param(rebx, force->ap, "pf_as");
     const double* n = rebx_get_param(rebx, force->ap, "pf_n");
-    const double* m0p = rebx_get_param(rebx, force->ap, "pf_m0p");
-    const double* m_planet = rebx_get_param(rebx, force->ap, "pf_mplanet");
-    const double* m_star = rebx_get_param(rebx, force->ap, "pf_mstar");
+    const double* M0 = rebx_get_param(rebx, force->ap, "pf_m0p");
+    const double* mp = rebx_get_param(rebx, force->ap, "pf_mplanet");
+    const double* ms = rebx_get_param(rebx, force->ap, "pf_mstar");
 
     // // other constants
-    double inc_s = -1. * (*inc_p);
-    double nt = (*n) * t + (*m0p);
-    double Gm_p = G * (*m_planet);
-    double Gm_s = G * (*m_star);
+    double Gm_p = G * (*mp);
+    double Gm_s = G * (*ms);
+    double nt = (*n) * t + (*M0);
 
-    // get planet position
-    double planet_x = (*ap) * cos(nt);
-    double planet_y = (*ap) * sin(nt) * cos(*inc_p);
-    double planet_z = (*ap) * sin(nt) * sin(*inc_p);
+    // get xyz position of planet
+    double planet_x = (*ap)*cos(nt);
+    double planet_y = (*ap)*sin(nt);
+    double planet_z = 0.;
 
     // get star position
-    double star_x = -1. * (*ap) * cos(nt);
-    double star_y = -1. * (*ap) * sin(nt) * cos(inc_s);
-    double star_z = (*ap) * sin(nt) * sin(inc_s);
+    double mass_ratio = -*mp / *ms;
+    double star_x = mass_ratio * planet_x;
+    double star_y = mass_ratio * planet_y;
+    double star_z = 0.;
 
     // particle position
     double x = particles[0].x;
@@ -123,8 +123,8 @@ void rebx_planet_force(struct reb_simulation* const sim, struct rebx_force* cons
     if (reb_output_check(sim, 10.) && ds <= 5 * *ap){
         struct reb_simulation* r = reb_create_simulation();
         r->G = sim->G;
-        reb_add_fmt(r, "m", *m_star);
-        reb_add_fmt(r, "m a e inc M", *m_planet, *ap, 0., *inc_p, (*n) * t + (*m0p));
+        reb_add_fmt(r, "m", *ms);
+        reb_add_fmt(r, "m a e inc M", *mp, *ap, 0., *inc_p, (*n) * t + (*m0p));
         reb_move_to_com(r);
 
         struct reb_orbit o =  reb_tools_particle_to_orbit(sim->G, particles[0], r->particles[0]);
