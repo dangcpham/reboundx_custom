@@ -144,6 +144,7 @@ void rebx_register_default_params(struct rebx_extras* rebx){
     rebx_register_param(rebx, "lt_p_haty", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "lt_p_hatz", REBX_TYPE_DOUBLE);
     rebx_register_param(rebx, "lt_c", REBX_TYPE_DOUBLE);
+    rebx_register_param(rebx, "stellar_interp", REBX_TYPE_POINTER);
 }
 
 void rebx_register_param(struct rebx_extras* const rebx, const char* name, enum rebx_param_type type){
@@ -440,6 +441,10 @@ struct rebx_operator* rebx_load_operator(struct rebx_extras* const rebx, const c
     else if (strcmp(name, "track_min_distance") == 0){
         operator->step_function = rebx_track_min_distance;
         operator->operator_type = REBX_OPERATOR_RECORDER;
+    }
+    else if (strcmp(name, "modify_stellar_evolution") == 0){
+        operator->step_function = rebx_modify_stellar_evolution;
+        operator->operator_type = REBX_OPERATOR_UPDATER;
     }
     else{
         char str[300];
