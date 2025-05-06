@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import warnings
 
 #Find suffix
 import sysconfig
@@ -8,9 +9,11 @@ if suffix is None:
 
 #Import shared C library
 import os
-pymodulespath = os.path.dirname(__file__)
+pymodulespath = os.path.dirname(os.path.abspath(__file__))
+pymodulespath = os.path.abspath(os.path.join(pymodulespath, os.pardir))
+__libpath__ = os.path.join(pymodulespath, "libreboundx"+suffix)
 from ctypes import *
-clibreboundx = cdll.LoadLibrary(pymodulespath + '/../libreboundx' + suffix)
+clibreboundx = cdll.LoadLibrary(__libpath__)
 
 # Version
 __version__ = c_char_p.in_dll(clibreboundx, "rebx_version_str").value.decode('ascii')
@@ -27,7 +30,7 @@ try:
     moduleversion = pkg_resources.require("reboundx")[0].version
     libreboundxversion = __version__
     if moduleversion != libreboundxversion:
-        print("WARNING: python module and libreboundx have different version numbers: '%s' vs '%s'.\n".format(moduleversion, libreboundxversion))
+        warnings.warn("WARNING: python module and libreboundx have different version numbers: '%s' vs '%s'.\n" % (moduleversion, libreboundxversion), ImportWarning)
 except:
     pass    # this check fails in python 3. Problem with setuptools
 
@@ -41,9 +44,10 @@ def params(self):
 
 rebound.Particle.params = params
 
+
 from .extras import Extras, Param, Node, Force, Operator, integrators, Interpolator, Planets
-from .simulationarchive import SimulationArchive
+from .simulationarchive import Simulationarchive
 from .tools import coordinates, install_test
 from .params import Params
 
-__all__ = ["__version__", "__build__", "__githash__", "Extras", "SimulationArchive", "Param", "Interpolator", "Params", "coordinates", "integrators", "Planets"]
+__all__ = ["__version__", "__build__", "__githash__", "Extras", "Simulationarchive", "Param", "Interpolator", "Params", "coordinates", "integrators", "Planets"]

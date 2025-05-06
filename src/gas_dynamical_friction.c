@@ -32,7 +32,7 @@
  * Implementation Paper    `Generozov and Perets 2022 <https://arxiv.org/abs/2212.11301>`_
  * Based on                `Ostriker 1999 (with simplifications) <https://ui.adsabs.harvard.edu/abs/1999ApJ...513..252O/abstract>`_, `Just et al 2012 <https://ui.adsabs.harvard.edu/abs/2012ApJ...758...51J/abstract>`_.
  * C Example               :ref:`c_example_gas_dynamical_friction`
- * Python Example          `gas_dynamical_friction.ipynb <https://github.com/dtamayo/reboundx/blob/master/ipython_examples/gas_dynamical_friction.ipynb>`_
+ * Python Example          `GasDynamicalFriction.ipynb <https://github.com/dtamayo/reboundx/blob/master/ipython_examples/GasDynamicalFriction.ipynb>`_
  *                        
  * 
  * ======================= ===============================================
@@ -123,7 +123,7 @@ static void rebx_calculate_gas_dynamical_friction(struct reb_simulation* const s
         //scale height is defined by user-defined aspect ratio. Truncate the disc vertically
         //at 10 scale heights...
         const double h=hr*rcyl;
-        const double vert=(abs(diff.z)<(10*h))?exp(-diff.z*diff.z/(2.0*h*h)):0;
+        const double vert=(fabs(diff.z)<(10*h))?exp(-diff.z*diff.z/(2.0*h*h)):0;
         const double rhog_loc=rhog*pow(rcyl, alpha_rhog)*vert;
         const double mp = p.m;
         const double rstar = p.r;
@@ -142,31 +142,31 @@ void rebx_gas_dynamical_friction(struct reb_simulation* const sim, struct rebx_f
     struct rebx_extras* const rebx = sim->extras;
     double* rhog= rebx_get_param(rebx, force->ap, "gas_df_rhog");
     if (rhog == NULL){
-        reb_error(sim, "Need to specify a gas density\n");
+        reb_simulation_error(sim, "Need to specify a gas density\n");
     }
     double* alpha_rhog= rebx_get_param(rebx, force->ap, "gas_df_alpha_rhog");
     if (alpha_rhog== NULL){
-        reb_error(sim, "Need to specify a profile for gas density\n");
+        reb_simulation_error(sim, "Need to specify a profile for gas density\n");
     }
     double* cs= rebx_get_param(rebx, force->ap, "gas_df_cs");
     if (cs == NULL){
-        reb_error(sim, "Need to set a sound speed.\n");
+        reb_simulation_error(sim, "Need to set a sound speed.\n");
     }
     double* alpha_cs= rebx_get_param(rebx, force->ap, "gas_df_alpha_cs");
     if (alpha_cs== NULL){
-        reb_error(sim, "Need to specify a profile for the sound speed\n");
+        reb_simulation_error(sim, "Need to specify a profile for the sound speed\n");
     }
     double* xmin= rebx_get_param(rebx, force->ap, "gas_df_xmin");
     if (xmin == NULL){
-        reb_error(sim, "Need to set a cutoff.\n");
+        reb_simulation_error(sim, "Need to set a cutoff.\n");
     }
     double* hr= rebx_get_param(rebx, force->ap, "gas_df_hr");
     if (hr == NULL){
-        reb_error(sim, "Need an aspect ratio.\n");
+        reb_simulation_error(sim, "Need an aspect ratio.\n");
     }
     double* Qd=rebx_get_param(rebx, force->ap, "gas_df_Qd");
     if (Qd == NULL){
-        reb_error(sim, "Need to specify Qd");
+        reb_simulation_error(sim, "Need to specify Qd");
     }
 
     rebx_calculate_gas_dynamical_friction(sim, particles, N, *rhog, *alpha_rhog, *cs, *alpha_cs, *xmin, *hr, *Qd);

@@ -1,6 +1,6 @@
 name: REBOUNDx (python)
 
-on: [push, pull_request, repository_dispatch]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -11,10 +11,10 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.11"]
-        os: [ubuntu-latest, macos-11]
+        os: [ubuntu-latest, macos-13]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -22,25 +22,9 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest
-          pip install numpy matplotlib
-      - name: Clone REBOUND repo # in case we need to checkout version that triggered REBOUNDx CI
-        uses: actions/checkout@v4
-        with: 
-          repository: hannorein/rebound
-          ref: ${{ github.event.client_payload.sha }}
-          path: ./rebound
-      - name: Default PyPI REBOUND install
-        if: github.event_name != 'repository_dispatch' # if not triggered by REBOUND, use latest PyPI version
-        run: pip install rebound
-      - name: Trigger REBOUND version install
-        if: github.event_name == 'repository_dispatch' # if triggered, installed version checked out above
-        run: |
-          echo "Installing REBOUND SHA: ${{ github.event.client_payload.sha }}"
-          pip install ./rebound
-      - name: Install REBOUNDx
-        run: |
-          pip install -e . 
+          pip install pytest wheel setuptools numpy matplotlib 
+          pip install rebound
+          pip install -e . -v 
       - name: Output package contents
         run: pip show reboundx -vf
       - name: Run unit tests
