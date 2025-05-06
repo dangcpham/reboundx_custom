@@ -103,7 +103,7 @@ void rebx_planets_force(struct reb_simulation* const sim, struct rebx_force* con
         // (since some reference t0 time, corresponding to M0)
         double M = M0 + n * (t-t0);
         // convert to true anomaly
-        double f = reb_tools_M_to_f(e, M);
+        double f = reb_M_to_f(e, M);
 
         // find distance from barycenter at true anomaly f
         double rp = a * (1. - e*e) / (1. + e*cos(f));
@@ -140,7 +140,7 @@ void rebx_planets_force(struct reb_simulation* const sim, struct rebx_force* con
             particles[j].az += GM * dz/d3 ;
 
             if (i==0 && j==0 && d1 <= 0.004650467260962157){
-                reb_stop(sim);
+                reb_simulation_stop(sim);
             }
         }
     }
