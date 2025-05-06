@@ -57,7 +57,8 @@ enum rebx_param_type{
     REBX_TYPE_UINT32,
     REBX_TYPE_ORBIT,
     REBX_TYPE_ODE,
-    REBX_TYPE_VEC3D
+    REBX_TYPE_VEC3D,
+    REBX_TYPE_PLANETS
 };
 
 /**
@@ -244,6 +245,18 @@ struct rebx_interpolator{
     double* y2;
     int klo;
 };
+/**
+* @brief Structure for a REBOUNDx planets force.
+*/
+
+struct rebx_planets{
+    double* planets_data;
+    double* masses;
+    int Nplanets;
+    int Nparams;
+};
+
+
 /**
  * @brief Main REBOUNDx structure.
  * @details These fields are used internally by REBOUNDx and generally should not be changed manually by the user. Use the API instead.
@@ -701,6 +714,33 @@ void rebx_free_interpolator(struct rebx_interpolator* const interpolator);
 double rebx_interpolate(struct rebx_extras* const rebx, struct rebx_interpolator* const interpolator, const double time);
 /** @} */
 /** @} */
+
+
+/****************************************
+ Planets Import Routines
+ *****************************************/
+/**
+ * \name Planets Routines
+ * @{
+ */
+/**
+ * @defgroup PlanetsFunctions
+ * @details Functions for importing planets.
+ * @{
+ */
+
+/**
+ * @brief Takes in initial condition for planets.
+ * @details See the parameter interpolation examples in C and Python.
+ * @param rebx pointer to the REBOUNDx extras instance.
+ * @param Nvalues Length of times and values arrays (must be equal for both).
+ */
+struct rebx_planets* rebx_create_planets(struct rebx_extras* const rebx, const int Nvalues, const int Nparams,
+                                        const double* planets_data, const double* masses );
+/**
+ * @brief Frees the memory for a rebx_planets structure.
+ */
+void rebx_free_planets(struct rebx_planets* const planets);
 
 /****************************************
  Testing Functions

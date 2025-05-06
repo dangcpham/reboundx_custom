@@ -365,8 +365,29 @@ Interpolator._fields_ = [  ("interpolation", c_int),
 
 INTERPOLATION_TYPE = {"none":0, "spline":1}
 
+class Planets(Structure):
+    def __new__(cls, rebx, Nplanets, planets_data, masses):
+        planets = super(Planets, cls).__new__(cls)
+        return planets
+
+    def __init__(self, rebx, Nplanets, planets_data, masses):
+        # TODO: error checking
+        Nparams = 8
+
+        clibreboundx.rebx_init_planets(byref(rebx), byref(self), c_int(Nplanets), c_int(Nparams),
+                                    planets_data,masses)
+
+    def __del__(self):
+        if self._b_needsfree_ == 1:
+            clibreboundx.rebx_free_planets_pointers(byref(self))
+
+Planets._fields_ = [ ("planets_data", POINTER(c_double)), 
+                    ("masses", POINTER(c_double)),
+                    ("Nplanets", c_int)]
+
 # This list keeps pairing from C rebx_param_type enum to ctypes type 1-to-1. Derive the required mappings from it
-REBX_C_TO_CTYPES = [["REBX_TYPE_NONE", None], ["REBX_TYPE_DOUBLE", c_double], ["REBX_TYPE_INT",c_int], ["REBX_TYPE_POINTER", c_void_p], ["REBX_TYPE_FORCE", Force], ["REBX_TYPE_UNIT32", c_uint32], ["REBX_TYPE_ORBIT", rebound.Orbit], ["REBX_TYPE_ODE", rebound.ODE], ["REBX_TYPE_VEC3D", rebound.Vec3d]]
+
+REBX_C_TO_CTYPES = [["REBX_TYPE_NONE", None], ["REBX_TYPE_DOUBLE", c_double], ["REBX_TYPE_INT",c_int], ["REBX_TYPE_POINTER", c_void_p], ["REBX_TYPE_FORCE", Force], ["REBX_TYPE_UNIT32", c_uint32], ["REBX_TYPE_ORBIT", rebound.Orbit], ["REBX_TYPE_ODE", rebound.ODE], ["REBX_TYPE_VEC3D", rebound.Vec3d], ["REBX_TYPE_PLANETS", Planets]]
 REBX_CTYPES = {} # maps int value of rebx_param_type enum to ctypes type
 REBX_C_PARAM_TYPES = {} # maps string of rebx_param_type enum to int
 for i, pair in enumerate(REBX_C_TO_CTYPES):
